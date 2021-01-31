@@ -1,26 +1,17 @@
 const fs = require(`fs`);
-const EventEmitter = require('events');
-const Discord = require('discord.js');
+const Discord = require(`discord.js`);
+const MessageHandler = require(`./MessageHandler`);
+const ReactionHandler = require(`./ReactionHandler`);
 
-class Bot extends EventEmitter {
+class Bot {
   /**
-   * Initializes all modules, a Discord client, binds events.
+   * Initializes a Discord client, binds events.
    * @constructor
    */
   constructor() {
-    super();
-    this.client = new Discord.Client();
-
-    // Dynamically load commands from files
-    this.commands = new Discord.Collection();
-
-    fs.readdirSync(`./Commands`)
-      .filter(file => file.endsWith(`.js`))
-      .filter(file => file !== 'Command.js')
-      .map(file => require(`./Commands/${file}`))
-      .filter(cmd => cmd.name)
-      .forEach(cmd => this.commands.set(cmd.name.toLowerCase(), new cmd()), this);
-
+    this.client = new Discord.Client({ partials: [`MESSAGE`, `REACTION`] });
+    this.MessageHandler = new MessageHandler();
+    this.ReactionHandler = new ReactionHandler();
     this.bindEvents();
   }
   
@@ -28,8 +19,9 @@ class Bot extends EventEmitter {
    * Bind event functions.
    */
   bindEvents() {
-    this.client.on('ready', this.onReady.bind(this));
-    this.client.on('message', this.onMessage.bind(this));
+    this.client.on(`ready`, this.onReady.bind(this));
+    this.client.on(`message`, this.onMessage.bind(this));
+    this.client.on(`messageReactionAdd`, this.onMessageReactionAdd.bind(this));
   }
 
   /**
@@ -55,28 +47,20 @@ class Bot extends EventEmitter {
   }
 
   /**
-   * Handles messages.
+   * Passes message events to the MessageHandler.
    * @param {Message} Message Discord message object.
    */
   onMessage(Message) {
-    // Ignore system, bot messages
-    if (Message.system || Message.author.bot) {
-      return;
-    }
+    this.MessageHandler.handleMessage(Message);
+  }
 
-    // Ignore if message doesn't start with command character
-    if (!Message.content.startsWith(`!`)) return;
-
-    // Parse message, see if it matches command name or alias
-    const args = Message.content.slice(1).split(/ +/);
-    const commandName = args.shift().toLowerCase();
-    const command = this.commands.get(commandName) || this.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-
-    // If no command found, ignore
-    if (!command) return;
-
-    // Execute command
-    command.execute(Message, args);
+  /**
+   * Passes reaction add events to the ReactionHandler.
+   * @param {Reaction} Reaction The Discord reaction object.
+   * @param {User} User The Discord user that added the reaction.
+   */
+  onMessageReactionAdd(Reaction, User) {
+    this.ReactionHandler.handleReaction(Reaction, User);
   }
 }
 
