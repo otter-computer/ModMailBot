@@ -1,18 +1,17 @@
 {
   "name": "modmailbot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "readme": "README.md",
   "maintainers": [],
-  "author": "Thomas <thomas@otter.pizza>",
+  "author": "Thomas <thomas@otter.computer>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ThomasShaped/TemplateBot"
+    "url": "git+https://github.com/ThomasShaped/ModMailBot"
   },
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^12.5.1",
-    "express": "^4.17.1"
+    "discord.js": "^13.1.0"
   },
   "main": "index.js",
   "scripts": {
