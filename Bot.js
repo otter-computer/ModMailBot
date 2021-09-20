@@ -1,7 +1,4 @@
-const fs = require(`fs`);
 const Discord = require(`discord.js`);
-const MessageHandler = require(`./MessageHandler`);
-const ReactionHandler = require(`./ReactionHandler`);
 
 class Bot {
   /**
@@ -9,9 +6,10 @@ class Bot {
    * @constructor
    */
   constructor() {
-    this.client = new Discord.Client({ partials: [`MESSAGE`, `REACTION`] });
-    this.MessageHandler = new MessageHandler();
-    this.ReactionHandler = new ReactionHandler();
+    this.client = new Discord.Client({ intents: [ 
+      Discord.Intents.FLAGS.GUILDS,
+      Discord.Intents.FLAGS.GUILD_MESSAGES
+    ]});
     this.bindEvents();
   }
   
@@ -20,8 +18,7 @@ class Bot {
    */
   bindEvents() {
     this.client.on(`ready`, this.onReady.bind(this));
-    this.client.on(`message`, this.onMessage.bind(this));
-    this.client.on(`messageReactionAdd`, this.onMessageReactionAdd.bind(this));
+    this.client.on(`interactionCreate`, this.onInteractionCreate.bind(this));
   }
 
   /**
@@ -44,23 +41,94 @@ class Bot {
    */
   onReady() {
     console.log(`Connected to Discord as ${this.client.user.username}#${this.client.user.discriminator} <@${this.client.user.id}>`);
+
+    this.setCommands();
   }
 
-  /**
-   * Passes message events to the MessageHandler.
-   * @param {Message} Message Discord message object.
-   */
-  onMessage(Message) {
-    this.MessageHandler.handleMessage(Message);
+  onInteractionCreate(Interaction) {
+    // Handle commands
+    if (Interaction.isCommand()) {
+      if (Interaction.commandName === `generate`) {
+        this.generateModMailMessage(Interaction, Interaction.channel);
+        return;
+      }
+    }
+
+    // Handle buttons
+    if (Interaction.isButton()) {
+      if (Interaction.customId === `createModMail`) {
+        this.createNewThread(Interaction);
+      }
+    }
   }
 
-  /**
-   * Passes reaction add events to the ReactionHandler.
-   * @param {Reaction} Reaction The Discord reaction object.
-   * @param {User} User The Discord user that added the reaction.
-   */
-  onMessageReactionAdd(Reaction, User) {
-    this.ReactionHandler.handleReaction(Reaction, User);
+  async setCommands() {
+    const guild = await this.client.guilds.cache.first();
+
+    const adminRole = await guild.roles.cache.find(role => role.name === `Admin`);
+    const modRole = await guild.roles.cache.find(role => role.name === `Moderator`);
+
+    guild.commands.set([{
+      name: `generate`,
+      description: `Generate modmail message with contact button in channel where command is run`,
+      defaultPermission: false
+    }]).then(commands => {
+      commands.forEach(command => {
+        const permissions = [{
+          id: adminRole.id,
+          type: `ROLE`,
+          permission: true
+        }, {
+          id: modRole.id,
+          type: `ROLE`,
+          permission: true
+        }]
+
+        command.permissions.set({ permissions });
+      })
+    })
+  }
+
+  async generateModMailMessage(Interaction, Channel) {
+    const actions = new Discord.MessageActionRow();
+    actions.addComponents(
+      new Discord.MessageButton()
+      .setCustomId(`createModMail`)
+      .setLabel(`Contact Staff`)
+      .setEmoji(`💌`)
+      .setStyle(`PRIMARY`)
+    )
+
+    Channel.send({ content: `Click this button to contact staff.`, components: [actions] });
+
+    Interaction.reply({ content: `Done!` });
+    const response = await Interaction.fetchReply();
+    response.delete();
+  }
+
+  async createNewThread(Interaction) {
+    Interaction.reply({ content: `Creating your thread...`, ephemeral: true });
+
+    const staffRole = await Interaction.guild.roles.cache.find(role => role.name === `Staff`);
+
+    const thread = await Interaction.channel.threads.create({
+      name: `${Interaction.user.username}#${Interaction.user.discriminator}`,
+      autoArchiveDuration: 1440,
+      type: `private_thread`,
+      reason: `${Interaction.user.username}#${Interaction.user.discriminator} wants to contact staff.`
+    })
+
+    await thread.setLocked(true);
+    await thread.members.add(Interaction.member);
+
+    const infoMessage = await thread.send({ content: `Hello! Please write your message inside this private thread. Include as much informtion as you can. Staff will be notified after you send your first message.`})
+
+    const filter = Message => Message.member === Interaction.member;
+
+    thread.awaitMessages({ filter, max: 1 }).then(Message => {
+      infoMessage.delete();
+      thread.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff.` });
+    });
   }
 }
 
