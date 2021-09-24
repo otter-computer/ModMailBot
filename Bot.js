@@ -111,7 +111,7 @@ class Bot {
   async createNewThread(Interaction) {
     Interaction.reply({ content: `Creating your thread...`, ephemeral: true });
 
-    const staffRole = await Interaction.guild.roles.cache.find(role => role.name === `Staff`);
+    const staffRole = await Interaction.guild.roles.cache.find(role => role.name === process.env.STAFF_ROLE_NAME);
 
     const thread = await Interaction.channel.threads.create({
       name: `${Interaction.user.username}#${Interaction.user.discriminator}`,
