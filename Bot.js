@@ -99,7 +99,9 @@ class Bot {
       .setStyle(`PRIMARY`)
     )
 
-    Channel.send({ content: `Click this button to contact staff.`, components: [actions] });
+    const content = `Have a question, problem, or need help with something? Click the button below and our modmail bot will open a private thread between you and the staff team where you can discuss your issue. Please try to include as much information as possible in your first message so we can help you as quickly as we can.`;
+
+    Channel.send({ content: content, components: [actions] });
 
     Interaction.reply({ content: `Done!` });
     const response = await Interaction.fetchReply();
@@ -120,9 +122,11 @@ class Bot {
 
     await thread.setLocked(true);
     await thread.members.add(Interaction.member);
+    
+    const infoMessage = await thread.send({ content: `Hello! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`})
 
-    const infoMessage = await thread.send({ content: `Hello! Please write your message inside this private thread. Include as much informtion as you can. Staff will be notified after you send your first message.`})
-
+    Interaction.editReply({ content: `Here is your thread with the staff team: ${thread.lastMessage.url}` });
+    
     const filter = Message => Message.member === Interaction.member;
 
     thread.awaitMessages({ filter, max: 1 }).then(Message => {
