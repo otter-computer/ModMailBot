@@ -5,7 +5,6 @@ A bot to allow easy, private, in-server communication between members and modera
 ## Requirements
 
 - Node v16.6.1
-- Discord.js v13.1.0
 - Discord server boost level 2 (7 boosts) to unlock private threads
 
 ## Setup
