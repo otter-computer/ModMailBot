@@ -62,11 +62,13 @@ class Bot {
     }
   }
 
+  /**
+   * Add the `/generate` command to the guild
+   */
   async setCommands() {
     const guild = await this.client.guilds.cache.first();
 
-    const adminRole = await guild.roles.cache.find(role => role.name === `Admin`);
-    const modRole = await guild.roles.cache.find(role => role.name === `Moderator`);
+    const staffRole = await guild.roles.cache.find(role => role.name === process.env.STAFF_ROLE_NAME);
 
     guild.commands.set([{
       name: `generate`,
@@ -75,20 +77,21 @@ class Bot {
     }]).then(commands => {
       commands.forEach(command => {
         const permissions = [{
-          id: adminRole.id,
+          id: staffRole.id,
           type: `ROLE`,
           permission: true
-        }, {
-          id: modRole.id,
-          type: `ROLE`,
-          permission: true
-        }]
+        }];
 
         command.permissions.set({ permissions });
       })
     })
   }
 
+  /**
+   * Generates the message with the "Contact Staff" button inside the channel where this command is run.
+   * @param {Interaction} Interaction 
+   * @param {Channel} Channel 
+   */
   async generateModMailMessage(Interaction, Channel) {
     const actions = new Discord.MessageActionRow();
     actions.addComponents(
@@ -108,11 +111,16 @@ class Bot {
     response.delete();
   }
 
+  /**
+   * Handles creating the private thread when the "Contact Staff" button is pressed
+   * @param {Interaction} Interaction 
+   */
   async createNewThread(Interaction) {
     Interaction.reply({ content: `Creating your thread...`, ephemeral: true });
 
     const staffRole = await Interaction.guild.roles.cache.find(role => role.name === process.env.STAFF_ROLE_NAME);
 
+    // Create the private thread, invite the user. Auto archives after 24h.
     const thread = await Interaction.channel.threads.create({
       name: `${Interaction.user.username}#${Interaction.user.discriminator}`,
       autoArchiveDuration: 1440,
@@ -123,12 +131,15 @@ class Bot {
     await thread.setLocked(true);
     await thread.members.add(Interaction.member);
     
+    // Send a message in the new thread to notify the user and give instructions.
     const infoMessage = await thread.send({ content: `Hello! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`})
 
+    // Edit original interaction response with a link to the new thread
     Interaction.editReply({ content: `Here is your thread with the staff team: ${thread.lastMessage.url}` });
     
     const filter = Message => Message.member === Interaction.member;
 
+    // Message collector that listens for the user's first message, then contacts the staff role.
     thread.awaitMessages({ filter, max: 1 }).then(Message => {
       infoMessage.delete();
       thread.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff.` });
