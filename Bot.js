@@ -122,7 +122,7 @@ class Bot {
 
     // Create the private thread, invite the user. Auto archives after 24h.
     const thread = await Interaction.channel.threads.create({
-      name: `${Interaction.user.username}#${Interaction.user.discriminator}`,
+      name: `${Interaction.user.username}-${Interaction.user.discriminator}`,
       autoArchiveDuration: 1440,
       type: `private_thread`,
       reason: `${Interaction.user.username}#${Interaction.user.discriminator} wants to contact staff.`
@@ -132,7 +132,7 @@ class Bot {
     await thread.members.add(Interaction.member);
     
     // Send a message in the new thread to notify the user and give instructions.
-    const infoMessage = await thread.send({ content: `Hello! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`})
+    const infoMessage = await thread.send({ content: `Hello, ${Interaction.member.toString()}! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`})
 
     // Edit original interaction response with a link to the new thread
     Interaction.editReply({ content: `Here is your thread with the staff team: ${thread.lastMessage.url}` });
