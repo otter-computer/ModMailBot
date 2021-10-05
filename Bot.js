@@ -129,6 +129,7 @@ class Bot {
     })
 
     await thread.setLocked(true);
+    await thread.setInvitable(false);
     await thread.members.add(Interaction.member);
     
     // Send a message in the new thread to notify the user and give instructions.
