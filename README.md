@@ -19,15 +19,15 @@ After the user sends their first message inside the private thread the bot will 
 ## Permission setup
 
 ### `@everyone` channel permissions:
-❌ Send messages
-✅ Send messages in threads
-❌ Create public threads
-❌ Create private threads
+- ❌ Send messages
+- ✅ Send messages in threads
+- ❌ Create public threads
+- ❌ Create private threads
 
 ### Bot channel permissions:
-✅ Send messages
-✅ Send messages in threads
-❌ Create public threads
-✅ Create private threads
-✅ Manage messages
-✅ Manage threads
+- ✅ Send messages
+- ✅ Send messages in threads
+- ❌ Create public threads
+- ✅ Create private threads
+- ✅ Manage messages
+- ✅ Manage threads
