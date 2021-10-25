@@ -158,10 +158,8 @@ class Bot {
 
     // Message collector that listens for the user's first message, then contacts the staff role.
     thread.awaitMessages({ filter, max: 1 }).then(async Message => {
-      await thread.setInvitable(true);
       await infoMessage.delete();
       await thread.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff.` });
-      await thread.setInvitable(false);
     });
   }
 
@@ -171,9 +169,7 @@ class Bot {
 
     await Interaction.update({content: `Notifying staff`});
     
-    await thread.setInvitable(true);
-    await Interaction.followUp({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff, but they can't write in this thread because of a Discord permission bug! **For staff:** create a new **private thread** in another channel, reach out via DM, or move them into #quarantine temporarily.` });
-    await thread.setInvitable(false);
+    await Interaction.channel.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff, but they can't write in this thread because of a Discord permission bug! **For staff:** create a new **private thread** in another channel, reach out via DM, or move them into #quarantine temporarily.` });
   }
 }
 
