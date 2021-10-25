@@ -157,7 +157,7 @@ class Bot {
     const filter = Message => Message.member === Interaction.member;
 
     // Message collector that listens for the user's first message, then contacts the staff role.
-    thread.awaitMessages({ filter, max: 1 }).then(Message => {
+    thread.awaitMessages({ filter, max: 1 }).then(async Message => {
       await thread.setInvitable(true);
       await infoMessage.delete();
       await thread.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff.` });
