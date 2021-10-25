@@ -137,7 +137,7 @@ class Bot {
     await thread.members.add(Interaction.member);
     
     // Send a message in the new thread to notify the user and give instructions.
-    const infoMessage = `Hello, ${Interaction.member.toString()}! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`;
+    const infoMessageContent = `Hello, ${Interaction.member.toString()}! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`;
 
     // Include a button for users to click to notify staff if the mobile thread is broken
     const actions = new Discord.MessageActionRow();
@@ -149,7 +149,7 @@ class Bot {
       .setStyle(`DANGER`)
     );
     
-    await thread.send({ content: infoMessage, components: [actions] });
+    const infoMessage = await thread.send({ content: infoMessageContent, components: [actions] });
 
     // Edit original interaction response with a link to the new thread
     Interaction.editReply({ content: `Here is your thread with the staff team: ${thread.lastMessage.url}` });
