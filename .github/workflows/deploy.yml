@@ -47,8 +47,9 @@ jobs:
     - name: Create .env file
       run: |
         touch .env
-        echo "AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}" >> .env
         echo "NODE_ENV=production" >> .env
+        echo "AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}" >> .env
+        echo "STAFF_ROLE_NAME=Staff" >> .env
 
     - name: Deploy
       run: rsync -avz $GITHUB_WORKSPACE/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/ModMailBot

@@ -59,6 +59,10 @@ class Bot {
       if (Interaction.customId === `createModMail`) {
         this.createNewThread(Interaction);
       }
+
+      if (Interaction.customId === `modMailNotWorking`) {
+        this.notifyStaffNotWorking(Interaction);
+      }
     }
   }
 
@@ -133,7 +137,19 @@ class Bot {
     await thread.members.add(Interaction.member);
     
     // Send a message in the new thread to notify the user and give instructions.
-    const infoMessage = await thread.send({ content: `Hello, ${Interaction.member.toString()}! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`})
+    const infoMessage = `Hello, ${Interaction.member.toString()}! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`;
+
+    // Include a button for users to click to notify staff if the mobile thread is broken
+    const actions = new Discord.MessageActionRow();
+    actions.addComponents(
+      new Discord.MessageButton()
+      .setCustomId(`modMailNotWorking`)
+      .setLabel(`I can't write in this thread!`)
+      .setEmoji(`🛠`)
+      .setStyle(`DANGER`)
+    );
+    
+    await thread.send({ content: infoMessage, components: [actions] });
 
     // Edit original interaction response with a link to the new thread
     Interaction.editReply({ content: `Here is your thread with the staff team: ${thread.lastMessage.url}` });
@@ -145,6 +161,12 @@ class Bot {
       infoMessage.delete();
       thread.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff.` });
     });
+  }
+
+  async notifyStaffNotWorking(Interaction) {
+    const staffRole = await Interaction.guild.roles.cache.find(role => role.name === process.env.STAFF_ROLE_NAME);
+
+    Interaction.channel.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff, but they can't write in this thread because of a Discord permission bug! **For staff:** create a new **private thread** in another channel, reach out via DM, or move them into #quarantine temporarily.` });
   }
 }
 
