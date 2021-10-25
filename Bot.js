@@ -172,7 +172,7 @@ class Bot {
     await Interaction.update({content: `Notifying staff`});
     
     await thread.setInvitable(true);
-    await Interaction.reply({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff, but they can't write in this thread because of a Discord permission bug! **For staff:** create a new **private thread** in another channel, reach out via DM, or move them into #quarantine temporarily.` });
+    await Interaction.followUp({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff, but they can't write in this thread because of a Discord permission bug! **For staff:** create a new **private thread** in another channel, reach out via DM, or move them into #quarantine temporarily.` });
     await thread.setInvitable(false);
   }
 }
