@@ -166,7 +166,7 @@ class Bot {
   async notifyStaffNotWorking(Interaction) {
     const staffRole = await Interaction.guild.roles.cache.find(role => role.name === process.env.STAFF_ROLE_NAME);
 
-    Interaction.channel.send({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff, but they can't write in this thread because of a Discord permission bug! **For staff:** create a new **private thread** in another channel, reach out via DM, or move them into #quarantine temporarily.` });
+    Interaction.reply({ content: `${staffRole.toString()} ${Interaction.member.toString()} wants to contact staff, but they can't write in this thread because of a Discord permission bug! **For staff:** create a new **private thread** in another channel, reach out via DM, or move them into #quarantine temporarily.` });
   }
 }
 
