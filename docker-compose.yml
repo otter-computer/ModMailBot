@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  modmailbot:
+    image: modmailbot
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file: ./.env
