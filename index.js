@@ -1,4 +1,3 @@
-require('dotenv').config();
 const Bot = require(`./Bot`);
 
 const ModMailBot = new Bot();
