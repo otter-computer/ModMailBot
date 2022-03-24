@@ -28,6 +28,7 @@ jobs:
       run: |
         touch .env
         echo "AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}" >> .env
+        echo "STAFF_ROLE_NAME=Staff" >> .env
         echo "NODE_ENV=production" >> .env
 
     - name: Stop bot
