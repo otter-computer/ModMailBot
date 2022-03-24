@@ -3,6 +3,8 @@ version: '3.4'
 services:
   modmailbot:
     image: modmailbot
+    container_name: modmailbot
+    restart: always
     build:
       context: .
       dockerfile: ./Dockerfile
