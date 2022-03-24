@@ -24,32 +24,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Setup node 16
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-        cache: 'npm'
-
-    - name: npm install
-      run: npm install
-
-    - name: Prepare directory for deploy
-      run: |
-        rm -rf .git/
-        rm -rf .github/
-        rm -rf .vscode/
-        rm -rf img/
-        rm .gitignore
-        rm .env.example
-        rm README.md
-        rm LICENSE
-
     - name: Create .env file
       run: |
         touch .env
-        echo "NODE_ENV=production" >> .env
         echo "AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}" >> .env
-        echo "STAFF_ROLE_NAME=Staff" >> .env
+        echo "NODE_ENV=production" >> .env
 
-    - name: Deploy
-      run: rsync -avz $GITHUB_WORKSPACE/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/ModMailBot
+    - name: Stop bot
+      env:
+        DOCKER_HOST: "ssh://${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
+      run: docker compose down
+
+    - name: Build and start bot
+      env:
+        DOCKER_HOST: "ssh://${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}"
+      run: docker compose up --detach
