@@ -76,19 +76,8 @@ class Bot {
 
     guild.commands.set([{
       name: `generate`,
-      description: `Generate modmail message with contact button in channel where command is run`,
-      defaultPermission: false
-    }]).then(commands => {
-      commands.forEach(command => {
-        const permissions = [{
-          id: staffRole.id,
-          type: `ROLE`,
-          permission: true
-        }];
-
-        command.permissions.set({ permissions });
-      })
-    })
+      description: `Generate modmail message with contact button in channel where command is run`
+    }]);
   }
 
   /**
