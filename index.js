@@ -1,3 +1,4 @@
+const http = require(`http`);
 const Bot = require(`./Bot`);
 
 const ModMailBot = new Bot();
