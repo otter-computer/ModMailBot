@@ -2,11 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Start Bot",
-      "type": "docker",
+      "type": "node",
       "request": "launch",
-      "preLaunchTask": "docker-run: debug",
-      "platform": "node"
+      "name": "Launch Bot",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/index.js",
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }
