@@ -7,11 +7,11 @@
   "author": "Thomas <thomas@otter.computer>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ThomasShaped/ModMailBot"
+    "url": "git+https://github.com/otter-computer/ModMailBot"
   },
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^13.7.0"
+    "discord.js": "^14.8.0"
   },
   "engines": {
     "node": "^16.6.1"
