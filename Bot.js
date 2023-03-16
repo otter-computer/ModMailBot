@@ -7,8 +7,8 @@ class Bot {
    */
   constructor() {
     this.client = new Discord.Client({ intents: [ 
-      Discord.Intents.FLAGS.GUILDS,
-      Discord.Intents.FLAGS.GUILD_MESSAGES
+      Discord.GatewayIntentBits.Guilds,
+      Discord.GatewayIntentBits.GuildMessages
     ]});
     this.bindEvents();
   }
@@ -86,14 +86,14 @@ class Bot {
    * @param {Channel} Channel 
    */
   async generateModMailMessage(Interaction, Channel) {
-    const actions = new Discord.MessageActionRow();
-    actions.addComponents(
-      new Discord.MessageButton()
+    const actions = new Discord.ActionRowBuilder()
+    .addComponents(
+      new Discord.ButtonBuilder()
       .setCustomId(`createModMail`)
       .setLabel(`Contact Staff`)
       .setEmoji(`💌`)
-      .setStyle(`PRIMARY`)
-    )
+      .setStyle(Discord.ButtonStyle.Primary)
+    );
 
     const content = `Have a question, problem, or need help with something? Click the button below and our modmail bot will open a private thread between you and the staff team where you can discuss your issue. Please try to include as much information as possible in your first message so we can help you as quickly as we can.`;
 
@@ -117,11 +117,10 @@ class Bot {
     const thread = await Interaction.channel.threads.create({
       name: `${Interaction.user.username}-${Interaction.user.discriminator}`,
       autoArchiveDuration: 1440,
-      type: `private_thread`,
+      type: Discord.ChannelType.PrivateThread,
       reason: `${Interaction.user.username}#${Interaction.user.discriminator} wants to contact staff.`
     })
 
-    await thread.setLocked(true);
     await thread.setInvitable(false);
     await thread.members.add(Interaction.member);
     
@@ -129,13 +128,13 @@ class Bot {
     const infoMessageContent = `Hello, ${Interaction.member.toString()}! Please write your message inside this private thread. Include as much information as you can. Staff will be notified after you send your first message.`;
 
     // Include a button for users to click to notify staff if the mobile thread is broken
-    const actions = new Discord.MessageActionRow();
-    actions.addComponents(
-      new Discord.MessageButton()
+    const actions = new Discord.ActionRowBuilder()
+    .addComponents(
+      new Discord.ButtonBuilder()
       .setCustomId(`modMailNotWorking`)
       .setLabel(`I can't write in this thread!`)
       .setEmoji(`🛠`)
-      .setStyle(`DANGER`)
+      .setStyle(Discord.ButtonStyle.Danger)
     );
     
     const infoMessage = await thread.send({ content: infoMessageContent, components: [actions] });
