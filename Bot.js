@@ -40,7 +40,7 @@ class Bot {
    * Bot is connected to Discord.
    */
   onReady() {
-    console.log(`Connected to Discord as ${this.client.user.username}#${this.client.user.discriminator} <@${this.client.user.id}>`);
+    console.log(`Connected to Discord as ${this.client.user.username} <@${this.client.user.id}>`);
 
     this.setCommands();
   }
@@ -115,10 +115,10 @@ class Bot {
 
     // Create the private thread, invite the user. Auto archives after 24h.
     const thread = await Interaction.channel.threads.create({
-      name: `${Interaction.user.username}-${Interaction.user.discriminator}`,
+      name: `${Interaction.user.username}`,
       autoArchiveDuration: 1440,
       type: Discord.ChannelType.PrivateThread,
-      reason: `${Interaction.user.username}#${Interaction.user.discriminator} wants to contact staff.`
+      reason: `${Interaction.user.username} wants to contact staff.`
     })
 
     await thread.setInvitable(false);
